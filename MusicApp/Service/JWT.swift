@@ -29,9 +29,7 @@ struct JWT {
         let claims = JWTClaim(iss: teamId, iat: Date(), exp: Date() + 60 * 60 * 24 * 100 )
         var jwt = SwiftJWT.JWT(header: myHeader, claims: claims)
         
-        guard let tokenData = authToken.data(using: .utf8) else {
-            return ""
-        }
+        guard let tokenData = authToken.data(using: .utf8) else { return "" }
         do {
             let token = try jwt.sign(using: .es256(privateKey: tokenData))
             return token
