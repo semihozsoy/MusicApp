@@ -10,29 +10,46 @@ import Foundation
 // swiftlint:disable nesting
 enum MainPage {
 
+    enum Sections: Int {
+        case search
+        case playlists
+        case topChart
+    }
+    
     enum FetchMusics {
         
         struct Request {
             var id: String?
+            var searchText: String?
         }
         
         struct Response {
-            var playlists: [Playlists]?
-            var catalogPlaylists: [CatalogPlaylistsFluffyAttributes]?
+            var catalogPlaylists: [CatalogPlaylistsInfo]?
+            var topCharts: [TopChartsResults]?
+            var search: [SearchResults]?
         }
         
         struct ViewModel {
-            let playlistsInfo: [MainPage.FetchMusics.ViewModel.PlaylistsInfo]
-            let catalogPlaylits: [MainPage.FetchMusics.ViewModel.CatalogPlaylistsInfo]
+            var catalogPlaylistInfo: [MainPage.FetchMusics.ViewModel.CatalogPlaylistsInfo]?
             
-            struct PlaylistsInfo {
-                var name: String?
-                var dateAdded: Date?
-                var isPublic: Bool?
-            }
             struct CatalogPlaylistsInfo {
                 var albumName: String?
-                var songName: String?
+                var imageUrl: String?
+                var songCount: Int?
+            }
+            
+            var topChartsInfo: [MainPage.FetchMusics.ViewModel.TopChartsInfo]?
+            
+            struct TopChartsInfo {
+                var name: String?
+                var image: String?
+                var playlistName: String?
+            }
+            var searchInfo: [MainPage.FetchMusics.ViewModel.SearchInfo]?
+            
+            struct SearchInfo {
+                var artistName: String?
+                var name: String?
             }
             
         }
