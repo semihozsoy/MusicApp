@@ -44,41 +44,42 @@ public extension Endpoint {
 enum MusicEndpointItem: Endpoint {
     case playlists
     case catalogPlaylists(id:String)
-    case search(queryParams:Encodable)
-    case ratings(id:String)
+    case search(queryParams:String)
+    case topCharts
     var baseUrl: String {"https://api.music.apple.com/v1/"}
     
+    /*
+     3-)Arama içn search for catalog resources https://api.music.apple.com/v1/catalog/{storefront}/search
+     example: https://api.music.apple.com/v1/catalog/us/search?term=james+brown&limit=2&types=artists,albums
+     term=james+brown&limit=2&types=artists,albums
+     */
+  
     var path: String {
         switch self {
         case .playlists:
             return "me/library/playlists"
-        case .ratings(let id):
-            return "me/ratings/albums/\(id)"
+        case .topCharts:
+            return "catalog/tr/charts?types=songs,albums,playlists&genre=20&limit=20"
         case .catalogPlaylists(let id):
             return "catalog/tr/playlists/\(id)"
         case .search(let queryParams):
-            return prepareUrl(path: "catalog/us/search?", queryParams: queryParams.asDictionary())
+            return prepareUrl(path: "catalog/us/search?", text: queryParams)
         }
     }
-    private func prepareUrl(path: String, queryParams: [String:String]) -> String{
-        let text = ""
+    private func prepareUrl(path: String, text: String) -> String{
         let queryParams = ["term":"\(text)","limit":"2","types":"artists,albums"]
+        
         var signParams = ""
+        signParams += path
         for(key,value) in queryParams {
-            if value.count > 2 {
-                var value = value
-                value = value + "+"
+            var myValue = ""
+            if value.contains(" ")  {
+                myValue += value.replacingOccurrences(of: " ", with: "+")
             }
-            signParams += key + "=" + value + "&"
+            signParams.append("\(key)=\(myValue)&")
         }
-        if !signParams.isEmpty {
-            signParams = "" + signParams
-            if (signParams.hasPrefix("&")) {
-                signParams.removeLast()
-            }
-        }
-        let searchBaseUrl = baseUrl + signParams
-        return searchBaseUrl
+        signParams.removeLast()
+        return signParams
     }
     var method: HTTPMethod {
         switch self {
@@ -88,24 +89,18 @@ enum MusicEndpointItem: Endpoint {
             return .get
         case .search:
             return .get
-        case .ratings:
-            return .get
+        case .topCharts:
+            return .get 
         }
     }
 }
-// Swift lint kur!
-// Encodable to dictionary
-// pathin sonuna stringleri eklemek url'i hazır hale getirmek
-// MainPageWorkerdaki fonksiyon search encodable beklicek
 
 /*
- 1-) Parçaların beğeni durumu için Get Personal Album Rating playlists https://api.music.apple.com/v1/me/ratings/albums/{id}
- example:https://api.music.apple.com/v1/me/ratings/albums/pl.f0a6bef09e1a4d75a5b69d5699effefc
+ 1-) Parçaların top chartı için https://api.music.apple.com/v1/catalog/tr/charts
+ example:https://api.music.apple.com/v1/catalog/tr/charts?types=songs,albums,playlists&genre=20&limit=1
  
  2 -) Playlistler için Get All Library Playlists https://api.music.apple.com/v1/me/library/playlists
  example: https://api.music.apple.com/v1/me/library/playlists
  
- 3-)Arama içn search for catalog resources https://api.music.apple.com/v1/catalog/{storefront}/search
- example: https://api.music.apple.com/v1/catalog/us/search?term=james+brown&limit=2&types=artists,albums
- term=james+brown&limit=2&types=artists,albums
+
  */
