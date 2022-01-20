@@ -5,7 +5,8 @@
 //  Created by mobven semih on 4.09.2021.
 //
 
-import Foundation
+import UIKit
+import AVFoundation
 
 protocol MusicPlayerBusinessLogic: AnyObject {
     func fetchMusic(request: MusicPlayer.FetchMusic.Request)
@@ -36,13 +37,18 @@ final class MusicPlayerInteractor: MusicPlayerBusinessLogic, MusicPlayerDataStor
         guard catalogPlaylist.count > selectedIndex else { return }
         let item = catalogPlaylist[safe:selectedIndex]
        
-        self.presenter?.presentMusicPlayer(response: MusicPlayer.FetchMusic.Response(songName: item?.attributes?.name, playlistName: item?.attributes?.albumName ,image: item?.attributes?.artwork?.url, songUrl: item?.attributes?.previews?.first?.url))
+        self.presenter?.presentMusicPlayer(response: MusicPlayer.FetchMusic.Response(songName: item?.attributes?.name,
+                                                                                     playlistName: item?.attributes?.albumName,
+                                                                                     image: item?.attributes?.artwork?.url,
+                                                                                     songUrl: item?.attributes?.previews?.first?.url))
     }
     
     func changeMusic(index: Int) {
         selectedIndex += index
         fetchMusic(request: MusicPlayer.FetchMusic.Request(index: selectedIndex))
     }
+    
+    
     
     
 }
